@@ -36,7 +36,7 @@ After the camera will start and once `r` is pressed it will start reading for a 
 Detailed results are shown in terminal.
 
 ## Reference
-- [Mediapipe : Pose classification](https://google.github.io/mediapipe/solutions/pose_classification.html)
+- [Sign Language Recognition - using MediaPipe & DTW](https://www.sicara.fr/blog/sign-language-recognition-using-mediapipe)
 
 ## To Do
 * Refactor code
