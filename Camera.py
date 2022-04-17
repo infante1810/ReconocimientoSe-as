@@ -9,7 +9,7 @@ RED_COLOR = (25, 35, 240)
 HEIGHT = 600
 
 
-class WebcamManager(object):
+class Camera(object):
     """Object that displays the Webcam output, draws the landmarks detected and
     outputs the sign prediction
     """

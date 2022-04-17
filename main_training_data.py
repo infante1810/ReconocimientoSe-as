@@ -48,8 +48,8 @@ def download_video(name, video_id, start_time, duration_time):
 
 print("\nDownloading videos of signs from YouTube\n")
 
-# Create the dataset based on yt_links.csv
-df_links = pd.read_csv("yt_links.csv")
+# Create the dataset based on urlList.csv
+df_links = pd.read_csv("data/urlList.csv")
 for idx, row in tqdm(df_links.iterrows(), total=df_links.shape[0]):
     download_video(*row)
 

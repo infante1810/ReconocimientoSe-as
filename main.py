@@ -1,24 +1,23 @@
 import cv2
 import mediapipe
 
-from utils.dataset_utils import load_dataset, load_reference_signs
-from utils.mediapipe_utils import mediapipe_detection
-from sign_recorder import SignRecorder
-from webcam_manager import WebcamManager
+import Operations
+from Recorder import Recorder
+from Camera import Camera
 
 
 if __name__ == "__main__":
     # Create dataset of the videos where landmarks have not been extracted yet
-    videos = load_dataset()
+    videos = Operations.load_dataset()
 
-    # Create a DataFrame of reference signs (name: str, model: SignModel, distance: int)
-    reference_signs = load_reference_signs(videos)
+    # Create a DataFrame of reference signs (name: str, model: GestureModel, distance: int)
+    reference_signs = Operations.load_reference_signs(videos)
 
     # Object that stores mediapipe results and computes sign similarities
-    sign_recorder = SignRecorder(reference_signs)
+    sign_recorder = Recorder(reference_signs)
 
     # Object that draws keypoints & displays results
-    webcam_manager = WebcamManager()
+    webcam_manager = Camera()
 
     # Turn on the webcam
     cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
@@ -32,7 +31,7 @@ if __name__ == "__main__":
             ret, frame = cap.read()
 
             # Make detections
-            image, results = mediapipe_detection(frame, holistic)
+            image, results = Operations.mediapipe_detection(frame, holistic)
 
             # Process results
             sign_detected, is_recording = sign_recorder.process_results(results)

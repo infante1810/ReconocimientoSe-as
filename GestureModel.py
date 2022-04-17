@@ -2,10 +2,10 @@ from typing import List
 
 import numpy as np
 
-from models.hand_model import HandModel
+from HandShape import HandShape
 
 
-class SignModel(object):
+class GestureModel(object):
     def __init__(
         self, left_hand_list: List[List[float]], right_hand_list: List[List[float]]
     ):
@@ -38,6 +38,6 @@ class SignModel(object):
             if np.sum(hand_list[frame_idx]) == 0:
                 continue
 
-            hand_gesture = HandModel(hand_list[frame_idx])
+            hand_gesture = HandShape(hand_list[frame_idx])
             embedding.append(hand_gesture.feature_vector)
         return embedding

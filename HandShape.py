@@ -4,7 +4,7 @@ import numpy as np
 import mediapipe as mp
 
 
-class HandModel(object):
+class HandShape(object):
     """
     Params
         landmarks: List of positions

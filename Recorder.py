@@ -2,12 +2,13 @@ import pandas as pd
 import numpy as np
 from collections import Counter
 
-from utils.dtw import dtw_distances
-from models.sign_model import SignModel
-from utils.landmark_utils import extract_landmarks
+from GestureModel import GestureModel
+import Operations
+
+from fastdtw import fastdtw
 
 
-class SignRecorder(object):
+class Recorder(object):
     def __init__(self, reference_signs: pd.DataFrame, seq_len=50):
         # Variables for recording
         self.is_recording = False
@@ -26,9 +27,9 @@ class SignRecorder(object):
         self.reference_signs["distance"].values[:] = 0
         self.is_recording = True
 
-    def process_results(self, results) -> (str, bool):
+    def process_results(self, results):
         """
-        If the SignRecorder is in the recording state:
+        If the Recorder is in the recording state:
             it stores the landmarks during seq_len frames and then computes the sign distances
         :param results: mediapipe output
         :return: Return the word predicted (blank text if there is no distances)
@@ -52,15 +53,15 @@ class SignRecorder(object):
         """
         left_hand_list, right_hand_list = [], []
         for results in self.recorded_results:
-            _, left_hand, right_hand = extract_landmarks(results)
+            _, left_hand, right_hand = Operations.extract_landmarks(results)
             left_hand_list.append(left_hand)
             right_hand_list.append(right_hand)
 
-        # Create a SignModel object with the landmarks gathered during recording
-        recorded_sign = SignModel(left_hand_list, right_hand_list)
+        # Create a GestureModel object with the landmarks gathered during recording
+        recorded_sign = GestureModel(left_hand_list, right_hand_list)
 
         # Compute sign similarity with DTW (ascending order)
-        self.reference_signs = dtw_distances(recorded_sign, self.reference_signs)
+        self.reference_signs = self.dtw_distances(recorded_sign, self.reference_signs)
 
         # Reset variables
         self.recorded_results = []
@@ -113,3 +114,45 @@ class SignRecorder(object):
         if count / batch_size < threshold:
             return "Señal desconocida: {} {} {}".format(count, batch_size, count/batch_size)
         return predicted_sign
+
+
+
+
+
+    ############# DTW.PY
+
+    def dtw_distances(self, recorded_sign: GestureModel, reference_signs: pd.DataFrame):
+        """
+        Use DTW to compute similarity between the recorded sign & the reference signs
+
+        :param recorded_sign: a GestureModel object containing the data gathered during record
+        :param reference_signs: pd.DataFrame
+                                columns : name, dtype: str
+                                        sign_model, dtype: GestureModel
+                                        distance, dtype: float64
+        :return: Return a sign dictionary sorted by the distances from the recorded sign
+        """
+        # Embeddings of the recorded sign
+        rec_left_hand = recorded_sign.lh_embedding
+        rec_right_hand = recorded_sign.rh_embedding
+
+        for idx, row in reference_signs.iterrows():
+            # Initialize the row variables
+            ref_sign_name, ref_sign_model, _ = row
+
+            # If the reference sign has the same number of hands compute fastdtw
+            if (recorded_sign.has_left_hand == ref_sign_model.has_left_hand) and (
+                recorded_sign.has_right_hand == ref_sign_model.has_right_hand
+            ):
+                ref_left_hand = ref_sign_model.lh_embedding
+                ref_right_hand = ref_sign_model.rh_embedding
+
+                if recorded_sign.has_left_hand:
+                    row["distance"] += list(fastdtw(rec_left_hand, ref_left_hand))[0]
+                if recorded_sign.has_right_hand:
+                    row["distance"] += list(fastdtw(rec_right_hand, ref_right_hand))[0]
+
+            # If not, distance equals infinity
+            else:
+                row["distance"] = np.inf
+        return reference_signs.sort_values(by=["distance"])
