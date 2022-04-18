@@ -3,6 +3,8 @@ import pandas as pd
 from tqdm import tqdm
 from GestureModel import GestureModel
 
+import warnings
+warnings.filterwarnings('ignore')
 import cv2
 import os
 import numpy as np
@@ -28,10 +30,10 @@ def cargar_dataset():
     videos_not_in_dataset = list(set(videos).difference(set(dataset)))
     n = len(videos_not_in_dataset)
     if n > 0:
-        print(f"\nExtraer puntos de referencia de nuevos videos: {n} videos detectados\n")
-        print(f"Videos detectados:")
-        for video_name in videos_not_in_dataset:
-            print(f"{video_name}")
+        #print(f"\nExtraer puntos de referencia de nuevos videos: {n} videos detectados\n")
+        #rint(f"Videos detectados:")
+        #for video_name in videos_not_in_dataset:
+            #print(f"{video_name}")
 
         for idx in tqdm(range(n)):
             save_landmarks_from_video(videos_not_in_dataset[idx])
@@ -49,20 +51,19 @@ def cargar_referencia_señales(videos):
         right_hand_list = load_array(os.path.join(path, f"rh_{video_name}.pickle"))
 
 
-        myDict = {
+        reference_signs = reference_signs.append(
+            {
                 "name": sign_name,
                 "sign_model": GestureModel(left_hand_list, right_hand_list),
                 "distance": 0,
-            }
-        reference_signs = pd.DataFrame([myDict])
+            },
+            ignore_index=True,
+        )
 
     # print(sign_name)
     # reference_signs = pd.concat(tmp, ignore_index=True)
     # print(reference_signs)
     # type(reference_signs)
-    print(
-        f'Recuento de diccionarios: {reference_signs[["name", "sign_model"]].groupby(["name"]).count()}'
-    )
     return reference_signs
 
 
@@ -82,7 +83,6 @@ def extraer_puntos_referencia(results):
     return pose, left_hand, right_hand
 
 def landmark_to_array(mp_landmark_list):
-    
     keypoints = []
     for landmark in mp_landmark_list.landmark:
         keypoints.append([landmark.x, landmark.y, landmark.z])

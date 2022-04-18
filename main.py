@@ -7,6 +7,7 @@ from Camera import Camera
 
 
 if __name__ == "__main__":
+    print("Analizando dataset... esto puede tardar varios minutos")
     #Cree un dataset de los videos donde aún no se han extraído puntos de referencia
     videos = Operations.cargar_dataset()
 
@@ -20,7 +21,7 @@ if __name__ == "__main__":
     webcam_manager = Camera()
 
     #Enciende la camara
-    cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+    cap = cv2.VideoCapture(1, cv2.CAP_DSHOW)
     #Configurar el entorno de Mediapipe
     with mediapipe.solutions.holistic.Holistic(
         min_detection_confidence=0.5, min_tracking_confidence=0.5
