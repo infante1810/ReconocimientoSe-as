@@ -7,42 +7,42 @@ from Camera import Camera
 
 
 if __name__ == "__main__":
-    # Create dataset of the videos where landmarks have not been extracted yet
-    videos = Operations.load_dataset()
+    #Cree un dataset de los videos donde aún no se han extraído puntos de referencia
+    videos = Operations.cargar_dataset()
 
-    # Create a DataFrame of reference signs (name: str, model: GestureModel, distance: int)
-    reference_signs = Operations.load_reference_signs(videos)
+    #Crea un marco de datos de signos de referencia (nombre, modelo, distancia)
+    reference_signs = Operations.cargar_referencia_señales(videos)
 
-    # Object that stores mediapipe results and computes sign similarities
+    #Objeto que almacena resultados de mediapipe y calcula similitudes de signos
     sign_recorder = Recorder(reference_signs)
 
-    # Object that draws keypoints & displays results
+    #Objeto que dibuja puntos clave y muestra resultados
     webcam_manager = Camera()
 
-    # Turn on the webcam
+    #Enciende la camara
     cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
-    # Set up the Mediapipe environment
+    #Configurar el entorno de Mediapipe
     with mediapipe.solutions.holistic.Holistic(
         min_detection_confidence=0.5, min_tracking_confidence=0.5
     ) as holistic:
         while cap.isOpened():
 
-            # Read feed
+            #Leer fuente
             ret, frame = cap.read()
 
-            # Make detections
-            image, results = Operations.mediapipe_detection(frame, holistic)
+            #Hacer detecciones
+            image, results = Operations.deteccion_mediapipe(frame, holistic)
 
-            # Process results
-            sign_detected, is_recording = sign_recorder.process_results(results)
+            #Procesar resultados
+            sign_detected, is_recording = sign_recorder.procesar_resultado(results)
 
-            # Update the frame (draw landmarks & display result)
-            webcam_manager.update(frame, results, sign_detected, is_recording)
+            #Actualice el frame
+            webcam_manager.actualizar(frame, results, sign_detected, is_recording)
 
             pressedKey = cv2.waitKey(1) & 0xFF
-            if pressedKey == ord("r"):  # Record pressing r
-                sign_recorder.record()
-            elif pressedKey == ord("q"):  # Break pressing q
+            if pressedKey == ord("r"):  #Grabacion presionando r
+                sign_recorder.registro()
+            elif pressedKey == ord("q"):  #Detener presionando q
                 break
 
         cap.release()
