@@ -7,12 +7,9 @@ from Camera import Camera
 
 
 if __name__ == "__main__":
-    print("Analizando dataset... esto puede tardar varios minutos")
-    #Cree un dataset de los videos donde aún no se han extraído puntos de referencia
-    videos = Operations.cargar_dataset()
-
-    #Crea un marco de datos de signos de referencia (nombre, modelo, distancia)
-    reference_signs = Operations.cargar_referencia_señales(videos)
+    # Obtiene el dataset generado por el programa main_training_data.py
+    filenameDataset = "gestures_dataset.pickle"
+    reference_signs = pd.read_pickle()
 
     #Objeto que almacena resultados de mediapipe y calcula similitudes de signos
     sign_recorder = Recorder(reference_signs)

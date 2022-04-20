@@ -11,6 +11,8 @@ import numpy as np
 import pickle as pkl
 import mediapipe as mp
 
+filenameDataset = 'gestures_dataset.pickle'
+
 
 def cargar_dataset():
     videos = [
@@ -64,7 +66,9 @@ def cargar_referencia_señales(videos):
     # reference_signs = pd.concat(tmp, ignore_index=True)
     # print(reference_signs)
     # type(reference_signs)
-    return reference_signs
+    #return reference_signs
+
+    reference_signs.to_pickle(filenameDataset)
 
 
 def extraer_puntos_referencia(results):

@@ -4,6 +4,7 @@ import os
 from shutil import copyfile
 import pandas as pd
 from tqdm import tqdm
+import Operations
 
 FOLDER = os.path.join("data", "videos")
 
@@ -55,3 +56,12 @@ for idx, row in tqdm(df_links.iterrows(), total=df_links.shape[0]):
 for file in os.listdir(FOLDER):
     if file.endswith(".mp4"):
         os.remove(os.path.join(FOLDER, file))
+
+
+print("Creando dataset... esto puede tardar varios minutos")
+#Cree un dataset de los videos donde aún no se han extraído puntos de referencia
+videos = Operations.cargar_dataset()
+
+#Crea un marco de datos de signos de referencia (nombre, modelo, distancia)
+Operations.cargar_referencia_señales(videos)
+print("¡Dataset gestures_dataset creado correctamente!")
