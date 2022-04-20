@@ -7,9 +7,9 @@ from Camera import Camera
 
 
 if __name__ == "__main__":
-    print("Analizando dataset... esto puede tardar varios minutos")
     #Cree un dataset de los videos donde aún no se han extraído puntos de referencia
     videos = Operations.cargar_dataset()
+    print("Dataset creado")
 
     #Crea un marco de datos de signos de referencia (nombre, modelo, distancia)
     reference_signs = Operations.cargar_referencia_señales(videos)

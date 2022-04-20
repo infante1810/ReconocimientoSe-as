@@ -1,10 +1,9 @@
+from codecs import ignore_errors
 import os
 import pandas as pd
 from tqdm import tqdm
 from GestureModel import GestureModel
 
-import warnings
-warnings.filterwarnings('ignore')
 import cv2
 import os
 import numpy as np
@@ -30,10 +29,11 @@ def cargar_dataset():
     videos_not_in_dataset = list(set(videos).difference(set(dataset)))
     n = len(videos_not_in_dataset)
     if n > 0:
-        #print(f"\nExtraer puntos de referencia de nuevos videos: {n} videos detectados\n")
-        #rint(f"Videos detectados:")
-        #for video_name in videos_not_in_dataset:
-            #print(f"{video_name}")
+        print("Analizando dataset... esto puede tardar varios minutos")
+        print(f"\nExtraer puntos de referencia de nuevos videos: {n} videos detectados\n")
+        print(f"Videos detectados:")
+        for video_name in videos_not_in_dataset:
+            print(f"{video_name}")
 
         for idx in tqdm(range(n)):
             save_landmarks_from_video(videos_not_in_dataset[idx])
@@ -42,7 +42,7 @@ def cargar_dataset():
 
 
 def cargar_referencia_señales(videos):
-    reference_signs = pd.DataFrame(columns=["name", "sign_model", "distance"])
+    reference_signs = {"name": [], "sign_model": [], "distance": []}
     for video_name in videos:
         sign_name = video_name.split("-")[0]
         path = os.path.join("data", "dataset", sign_name, video_name)
@@ -50,21 +50,11 @@ def cargar_referencia_señales(videos):
         left_hand_list = load_array(os.path.join(path, f"lh_{video_name}.pickle"))
         right_hand_list = load_array(os.path.join(path, f"rh_{video_name}.pickle"))
 
-
-        reference_signs = reference_signs.append(
-            {
-                "name": sign_name,
-                "sign_model": GestureModel(left_hand_list, right_hand_list),
-                "distance": 0,
-            },
-            ignore_index=True,
-        )
-
-    # print(sign_name)
-    # reference_signs = pd.concat(tmp, ignore_index=True)
-    # print(reference_signs)
-    # type(reference_signs)
-    return reference_signs
+        reference_signs["name"].append(sign_name)
+        reference_signs["sign_model"].append(GestureModel(left_hand_list, right_hand_list))
+        reference_signs["distance"].append(0)
+    
+    return pd.DataFrame(reference_signs, dtype=object)
 
 
 def extraer_puntos_referencia(results):
